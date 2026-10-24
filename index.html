@@ -3,102 +3,338 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#100720">
   <title>Astro's Universal Web</title>
-  <style>
-    * { box-sizing: border-box; }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-      font-family: system-ui, sans-serif;
-      color: #fff;
-      background: radial-gradient(ellipse at top, #302052, #100d27 70%);
+  <style>
+    :root {
+      --purple: #a78bfa;
+      --pink: #f0abfc;
+      --glass: rgba(20, 10, 42, 0.78);
+      --border: rgba(216, 180, 254, 0.35);
     }
 
-    main {
-      width: min(100%, 620px);
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: #100720;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      color: #fff;
+      background-color: #100720;
+
+      /* Your mascot image is stored in the GitHub repository. */
+      background-image:
+        linear-gradient(
+          rgba(10, 4, 28, 0.35),
+          rgba(10, 4, 28, 0.48)
+        ),
+        url("/Astro/astro-mascot.png");
+
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+    .stars {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.55;
+      background-image:
+        radial-gradient(2px 2px at 15% 20%, #fff 50%, transparent 100%),
+        radial-gradient(2px 2px at 75% 25%, #e9d5ff 50%, transparent 100%),
+        radial-gradient(1px 1px at 45% 75%, #fff 50%, transparent 100%),
+        radial-gradient(2px 2px at 85% 80%, #f0abfc 50%, transparent 100%),
+        radial-gradient(1px 1px at 25% 65%, #fff 50%, transparent 100%);
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 720px;
+      margin: auto;
+    }
+
+    .panel {
+      padding: clamp(28px, 6vw, 54px);
       text-align: center;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow:
+        0 24px 80px rgba(0, 0, 0, 0.42),
+        0 0 40px rgba(167, 139, 250, 0.12);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .planet {
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 20px;
+      display: grid;
+      place-items: center;
+      font-size: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6d28d9, #db2777);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      box-shadow: 0 0 32px rgba(192, 132, 252, 0.4);
     }
 
     h1 {
-      color: #d7b8ff;
-      font-size: clamp(2rem, 7vw, 3.2rem);
-      margin-bottom: 8px;
+      margin: 0;
+      font-size: clamp(30px, 6vw, 48px);
+      line-height: 1.15;
+      letter-spacing: -1.5px;
+      background: linear-gradient(90deg, #fff, #e9d5ff, #f5d0fe);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
 
-    p { color: #c9c2df; }
+    .subtitle {
+      max-width: 470px;
+      margin: 18px auto 30px;
+      color: #e9ddff;
+      font-size: 16px;
+      line-height: 1.7;
+    }
 
-    form {
+    .search-form {
       display: flex;
       gap: 10px;
-      margin-top: 28px;
+      width: 100%;
     }
 
-    input {
-      flex: 1;
+    .search-input {
       min-width: 0;
-      padding: 14px;
-      border: 1px solid #7662a8;
-      border-radius: 12px;
-      background: #211b3b;
-      color: white;
+      flex: 1;
+      padding: 16px 18px;
+      color: #fff;
       font: inherit;
+      font-size: 15px;
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(221, 214, 254, 0.3);
+      border-radius: 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    button {
-      padding: 14px 20px;
-      border: 0;
-      border-radius: 12px;
-      background: #b99aff;
-      color: #180e2b;
+    .search-input::placeholder {
+      color: #c4b5d9;
+    }
+
+    .search-input:focus {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.18);
+    }
+
+    .go-button {
+      padding: 16px 22px;
+      color: #1b1030;
       font: inherit;
-      font-weight: 700;
+      font-weight: 750;
+      white-space: nowrap;
       cursor: pointer;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #c4b5fd, #f0abfc);
+      box-shadow: 0 5px 20px rgba(192, 132, 252, 0.2);
+      transition: transform 0.2s, filter 0.2s;
     }
 
-    #message {
-      min-height: 24px;
-      margin-top: 18px;
-      font-size: 0.9rem;
+    .go-button:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
     }
 
-    @media (max-width: 420px) {
-      form { flex-direction: column; }
+    .go-button:active {
+      transform: translateY(0);
+    }
+
+    .hint {
+      min-height: 22px;
+      margin: 12px 0 0;
+      color: #d8c8ee;
+      font-size: 12px;
+    }
+
+    .quick-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .quick-links a {
+      padding: 9px 14px;
+      color: #f3e8ff;
+      text-decoration: none;
+      font-size: 13px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(221, 214, 254, 0.18);
+      border-radius: 999px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .quick-links a:hover {
+      background: rgba(167, 139, 250, 0.2);
+      border-color: var(--border);
+    }
+
+    footer {
+      margin-top: 22px;
+      text-align: center;
+      color: #e0d3f3;
+      font-size: 12px;
+      text-shadow: 0 2px 8px #100720;
+    }
+
+    @media (max-width: 520px) {
+      body {
+        padding: 16px;
+        background-attachment: scroll;
+      }
+
+      .panel {
+        padding: 28px 20px;
+        border-radius: 22px;
+      }
+
+      .search-form {
+        flex-direction: column;
+      }
+
+      .search-input,
+      .go-button {
+        width: 100%;
+      }
+
+      h1 {
+        letter-spacing: -0.8px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+      }
     }
   </style>
 </head>
+
 <body>
-  <main>
-    <h1>Astro's Universal Web</h1>
-    <p>Your gateway to the web, among the stars.</p>
+  <div class="stars" aria-hidden="true"></div>
 
-    <form id="address-form">
-      <input
-        id="address"
-        type="url"
-        placeholder="https://example.com"
-        aria-label="Website address"
-        required
-      >
-      <button type="submit">Go</button>
-    </form>
+  <main class="page">
+    <section class="panel">
+      <div class="planet" aria-hidden="true">✦</div>
 
-    <p id="message">
-      Astro is ready to launch. Browsing service not connected yet.
-    </p>
+      <h1>Astro's Universal Web</h1>
+
+      <p class="subtitle">
+        A little corner of the universe, made just for exploring.
+        Enter a website below and let your next adventure begin.
+      </p>
+
+      <form class="search-form" id="searchForm">
+        <input
+          class="search-input"
+          id="siteInput"
+          type="text"
+          placeholder="Enter a website, like example.com"
+          aria-label="Website address"
+          autocomplete="url"
+          spellcheck="false"
+          required
+        >
+
+        <button class="go-button" type="submit">
+          Go ✦
+        </button>
+      </form>
+
+      <p class="hint" id="message" role="status" aria-live="polite">
+        Your next destination is just a click away.
+      </p>
+
+      <nav class="quick-links" aria-label="Quick links">
+        <a href="https://www.wikipedia.org/" target="_blank"
+           rel="noopener noreferrer">Wikipedia ↗</a>
+        <a href="https://www.youtube.com/" target="_blank"
+           rel="noopener noreferrer">YouTube ↗</a>
+        <a href="https://www.google.com/" target="_blank"
+           rel="noopener noreferrer">Google ↗</a>
+      </nav>
+    </section>
+
+    <footer>
+      ✧ Made for curious minds, under a universe of stars ✧
+    </footer>
   </main>
 
   <script>
-    document.getElementById("address-form").addEventListener("submit", (event) => {
+    const form = document.getElementById("searchForm");
+    const input = document.getElementById("siteInput");
+    const message = document.getElementById("message");
+
+    form.addEventListener("submit", function (event) {
       event.preventDefault();
-      const address = document.getElementById("address").value;
-      document.getElementById("message").textContent =
-        "Website entered: " + address +
-        ". Connect the server browsing backend to open pages here.";
+
+      let address = input.value.trim();
+
+      if (!address) {
+        message.textContent = "Enter a website address first.";
+        input.focus();
+        return;
+      }
+
+      // Allow a domain such as example.com without requiring https://.
+      if (!/^[a-zA-Z][a-zA-Z\d+.-]*:/.test(address)) {
+        address = "https://" + address;
+      }
+
+      try {
+        const destination = new URL(address);
+
+        // Only allow normal web addresses.
+        if (
+          destination.protocol !== "https:" &&
+          destination.protocol !== "http:"
+        ) {
+          message.textContent =
+            "Please enter a normal HTTP or HTTPS website.";
+          return;
+        }
+
+        window.open(destination.href, "_blank", "noopener,noreferrer");
+        message.textContent = "Opening your destination in a new tab...";
+      } catch {
+        message.textContent =
+          "That address doesn't look right. Try example.com.";
+      }
     });
   </script>
 </body>
