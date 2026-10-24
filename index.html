@@ -295,47 +295,53 @@
     </footer>
   </main>
 
-  <script>
-    const form = document.getElementById("searchForm");
-    const input = document.getElementById("siteInput");
-    const message = document.getElementById("message");
+ 
+<script>
+  const form = document.getElementById("searchForm");
+  const input = document.getElementById("siteInput");
+  const message = document.getElementById("message");
 
-    form.addEventListener("submit", function (event) {
-      event.preventDefault();
+  // We'll fill this in when your Wispbyte backend is ready.
+  const BACKEND_URL = "";
 
-      let address = input.value.trim();
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
 
-      if (!address) {
-        message.textContent = "Enter a website address first.";
-        input.focus();
-        return;
+    const address = input.value.trim();
+
+    if (!address) {
+      message.textContent = "Please enter a website address.";
+      return;
+    }
+
+    if (!BACKEND_URL) {
+      message.textContent =
+        "✦ Astro's proxy backend isn't connected yet. Check back soon!";
+      return;
+    }
+
+    message.textContent = "Connecting to Astro's proxy...";
+
+    try {
+      const response = await fetch(
+        `${BACKEND_URL}/browse?url=${encodeURIComponent(address)}`
+      );
+
+      if (!response.ok) {
+        throw new Error("The backend returned an error.");
       }
 
-      // Allow a domain such as example.com without requiring https://.
-      if (!/^[a-zA-Z][a-zA-Z\d+.-]*:/.test(address)) {
-        address = "https://" + address;
-      }
+      const result = await response.json();
 
-      try {
-        const destination = new URL(address);
-
-        // Only allow normal web addresses.
-        if (
-          destination.protocol !== "https:" &&
-          destination.protocol !== "http:"
-        ) {
-          message.textContent =
-            "Please enter a normal HTTP or HTTPS website.";
-          return;
-        }
-
-        window.open(destination.href, "_blank", "noopener,noreferrer");
-        message.textContent = "Opening your destination in a new tab...";
-      } catch {
-        message.textContent =
-          "That address doesn't look right. Try example.com.";
-      }
-    });
-  </script>
+      // The backend will provide the page content here.
+      // We'll connect this to the in-page viewer when we build it.
+      message.textContent = result.message ||
+        "The backend responded, but the browser viewer isn't ready yet.";
+    } catch (error) {
+      message.textContent =
+        "Couldn't connect to Astro's backend. Please try again later.";
+    }
+  });
+</script>
 </body>
 </html>
