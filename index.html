@@ -297,15 +297,15 @@
  
 
 
+
 <script>
   const form = document.getElementById("searchForm");
   const input = document.getElementById("siteInput");
   const message = document.getElementById("message");
 
-  // Replace this with your actual public Wispbyte HTTPS address.
-  const BACKEND_URL = "";
+  const BROWSER_URL = "https://astro.wispbyte.app/";
 
-  form.addEventListener("submit", async (event) => {
+  form.addEventListener("submit", (event) => {
     event.preventDefault();
 
     const address = input.value.trim();
@@ -315,62 +315,32 @@
       return;
     }
 
-    if (!BACKEND_URL) {
-      message.textContent =
-        "Astro's backend address hasn't been configured yet.";
+    let destination;
+
+    try {
+      destination = new URL(
+        /^[a-zA-Z][a-zA-Z\d+.-]*:/.test(address)
+          ? address
+          : `https://${address}`
+      );
+
+      if (!["http:", "https:"].includes(destination.protocol)) {
+        throw new Error("Invalid protocol");
+      }
+    } catch {
+      message.textContent = "Please enter a valid website address.";
       return;
     }
 
-    message.textContent = "Checking Astro's backend...";
+    const browser = new URL(BROWSER_URL);
+    browser.searchParams.set("url", destination.href);
 
-    try {
-      const healthResponse = await fetch(
-        `${BACKEND_URL}/health`
-      );
+    message.textContent =
+      "Opening Astro's browser. If the site doesn't load, the Wispbyte frontend needs navigation support.";
 
-      if (!healthResponse.ok) {
-        throw new Error("Backend is unavailable.");
-      }
-
-      const health = await healthResponse.json();
-
-      if (health.online !== true) {
-        throw new Error("Backend is not online.");
-      }
-
-      message.textContent =
-        "Astro's backend is online! Checking browsing support...";
-
-      const browseResponse = await fetch(
-        `${BACKEND_URL}/browse`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ url: address })
-        }
-      );
-
-      const result = await browseResponse.json();
-
-      if (browseResponse.status === 501) {
-        message.textContent =
-          "Backend connected! The in-page browser still needs to be built.";
-        return;
-      }
-
-      if (!browseResponse.ok) {
-        throw new Error(result.error || "Browsing request failed.");
-      }
-
-      message.textContent =
-        result.message || "The backend received your request.";
-    } catch (error) {
-      message.textContent =
-        "Astro couldn't reach its backend. Check that the server is running and its address is correct.";
-    }
+    window.location.assign(browser.href);
   });
 </script>
 </body>
 </html>
+
